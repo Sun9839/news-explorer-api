@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
 
-const regex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
+const regex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
 
-const cardSchema = mongoose.Schema({
-  keywords: {
+const articleSchema = mongoose.Schema({
+  keyword: {
     type: String,
     required: true,
   },
   title: {
     type: String,
+    unique: true,
     required: true,
   },
   text: {
@@ -18,7 +19,6 @@ const cardSchema = mongoose.Schema({
   date: {
     type: Date,
     default: Date.now,
-    required: true,
   },
   source: {
     type: String,
@@ -44,7 +44,10 @@ const cardSchema = mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
     required: true,
+    select: false,
   },
 });
+
+module.exports = mongoose.model('Article', articleSchema);
