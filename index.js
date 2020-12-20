@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('dotenv').config();
+const cors = require('cors');
 const { createUser, login } = require('./controllers/user');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -14,6 +15,7 @@ const notFoundRouter = require('./routes/notFound').router;
 const { PORT = 3000 } = process.env;
 
 app.use(bodyParser.json());
+app.use(cors());
 
 mongoose.connect('mongodb://localhost:27017/newsexplorerdb', {
   useNewUrlParser: true,
