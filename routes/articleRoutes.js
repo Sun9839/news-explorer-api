@@ -1,17 +1,12 @@
 const articleRouter = require('express').Router();
 const { getArticles, createArticle, deleteArticle } = require('../controllers/article');
+const { deleteArticleValidation, createArticleValidation } = require('../middlewares/validation');
 
-articleRouter.delete('/articles/:id', (req, res, next) => {
-  deleteArticle(req, res, next);
-});
+articleRouter.delete('/articles/:id', deleteArticleValidation, deleteArticle);
 
-articleRouter.get('/articles', (req, res, next) => {
-  getArticles(req, res, next);
-});
+articleRouter.get('/articles', getArticles);
 
-articleRouter.post('/articles', (req, res, next) => {
-  createArticle(req, res, next);
-});
+articleRouter.post('/articles', createArticleValidation, createArticle);
 
 module.exports = {
   router: articleRouter,

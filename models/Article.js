@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const regex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+const regex = /^((ftp|http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9\\-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-\\/])*)?/;
 
 const articleSchema = mongoose.Schema({
   keyword: {
@@ -9,7 +9,6 @@ const articleSchema = mongoose.Schema({
   },
   title: {
     type: String,
-    unique: true,
     required: true,
   },
   text: {

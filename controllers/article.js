@@ -1,7 +1,5 @@
 const Article = require('../models/Article');
 const BadRequestError = require('../errors/badRequestError');
-const NotFoundError = require('../errors/notFoundError');
-const UnauthorizedError = require('../errors/unauthorizedError');
 
 const getArticles = (req, res, next) => {
   const own = req.user;
@@ -24,17 +22,22 @@ const createArticle = (req, res, next) => {
     keyword, title, text, source, link, image, owner,
   })
     .then((art) => {
-      res.send(art);
+      res.send({
+        _id: art._id,
+        keyword: art.keyword,
+        title: art.title,
+        text: art.text,
+        source: art.source,
+        link: art.link,
+        image: art.image,
+        date: art.date,
+      });
     })
     .catch((err) => {
       let error;
       if (err.name === 'ValidationError') {
         error = Error('Неправильно введены данные');
         error.statusCode = 400;
-        next(error);
-      } else if (err.name === 'MongoError') {
-        error = Error('Статья с таким названием уже существует');
-        error.statusCode = 409;
         next(error);
       }
       next(err);
@@ -43,14 +46,10 @@ const createArticle = (req, res, next) => {
 
 const deleteArticle = (req, res, next) => {
   const { id } = req.params;
-  const userId = req.user._id;
   Article.findById(id).select('+owner')
     .then((data) => {
       if (!data) {
         throw new BadRequestError('Такой статьи нет');
-      }
-      if (data.owner !== userId) {
-        throw new UnauthorizedError('Эта статья у вас не сохранена');
       }
       Article.findByIdAndRemove(id)
         .then((deletedArticle) => {

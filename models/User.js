@@ -23,11 +23,10 @@ const userSchema = mongoose.Schema({
     minlength: 2,
     maxlength: 30,
     required: true,
-    select: false,
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
+userSchema.statics.findUserByCredentials = function findUsByCred(email, password) {
   return this.findOne({ email }).select('+password')
     .then((data) => {
       if (!data) {

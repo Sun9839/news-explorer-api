@@ -1,6 +1,6 @@
 const NotFoundError = require('../errors/notFoundError');
 
-const notFound = (req, res, next) => {
+const notFound = () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 };
 

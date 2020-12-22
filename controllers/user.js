@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+
 const { NODE_ENV, JWT_SECRET } = process.env;
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
@@ -18,13 +19,22 @@ const createUser = (req, res, next) => {
         name,
       })
         .then((data) => {
-          res.send(data);
+          res.send({
+            _id: data._id,
+            email: data.email,
+            name: data.name,
+          });
         })
         .catch((err) => {
           let error;
           if (err.name === 'MongoError') {
             error = Error('email уже используется');
             error.statusCode = 409;
+            next(error);
+          }
+          if (err.name === 'ValidationError') {
+            error = Error('Неправильные данные');
+            error.statusCode = 400;
             next(error);
           }
           next(err);
@@ -54,13 +64,8 @@ const login = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new UnauthorizedError('Необходима авторизация');
-  }
-  const token = authorization.replace('Bearer ', '');
-  const payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
-  User.findOne({ _id: payload._id })
+  const userId = req.user._id;
+  User.findOne({ _id: userId })
     .then((data) => {
       if (!data) {
         throw new UnauthorizedError('Необходима авторизация');
@@ -68,9 +73,7 @@ const getUser = (req, res, next) => {
       res
         .send(data);
     })
-    .catch((err) => {
-      res.send(err.name);
-    });
+    .catch(next);
 };
 
 module.exports = { createUser, login, getUser };
