@@ -1,3 +1,3 @@
 # news-explorer-api
 
-## адрес API: https://api.alexander98news.students.nomoredomains.icu/
+## адрес API: https://api.alexander9839news.students.nomoredomains.icu
