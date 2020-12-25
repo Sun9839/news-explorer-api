@@ -1,22 +1,23 @@
 const jwt = require('jsonwebtoken');
 const UnauthorizedError = require('../errors/unauthorizedError');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { unauthorized } = require('../constants/requests');
+const { jwtSecret } = require('../constants/forEnv');
 
 module.exports = (req, res, next) => {
   if (!req.headers.authorization) {
-    throw new UnauthorizedError('Необходима авторизация');
+    throw new UnauthorizedError(unauthorized);
   }
   const { authorization } = req.headers;
   if (!authorization.startsWith('Bearer ')) {
-    throw new UnauthorizedError('Необходима авторизация');
+    throw new UnauthorizedError(unauthorized);
   }
   const token = authorization.replace('Bearer ', '');
   let payload;
   try {
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
+    payload = jwt.verify(token, jwtSecret);
   } catch (err) {
-    const error = Error('Необходима авторизация');
+    const error = Error(unauthorized);
     error.statusCode = 401;
     next(error);
   }

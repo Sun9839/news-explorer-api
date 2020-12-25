@@ -1,4 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
+const isUrl = require('validator/lib/isURL');
+const { badUrl } = require('../constants/requests');
 
 const deleteArticleValidation = celebrate({
   params: Joi.object().keys({
@@ -12,8 +14,18 @@ const createArticleValidation = celebrate({
     title: Joi.string().required(),
     text: Joi.string().required(),
     source: Joi.string().required(),
-    link: Joi.string().required(),
-    image: Joi.string().required(),
+    link: Joi.string().required().custom((value, helpers) => {
+      if (isUrl(value)) {
+        return value;
+      }
+      return helpers.message(badUrl);
+    }),
+    image: Joi.string().required().custom((value, helpers) => {
+      if (isUrl(value)) {
+        return value;
+      }
+      return helpers.message(badUrl);
+    }),
   }).unknown(true),
 });
 

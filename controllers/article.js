@@ -1,5 +1,7 @@
 const Article = require('../models/Article');
 const BadRequestError = require('../errors/badRequestError');
+const ForbiddenError = require('../errors/forbiddenError');
+const { badData, notYourArticle, badId } = require('../constants/requests');
 
 const getArticles = (req, res, next) => {
   const own = req.user;
@@ -16,7 +18,7 @@ const createArticle = (req, res, next) => {
   } = req.body;
   const owner = req.user;
   if (!req.body || !keyword || !title || !text || !source || !link || !image) {
-    throw new BadRequestError('Неправильно введены данные');
+    throw new BadRequestError(badData);
   }
   Article.create({
     keyword, title, text, source, link, image, owner,
@@ -36,7 +38,7 @@ const createArticle = (req, res, next) => {
     .catch((err) => {
       let error;
       if (err.name === 'ValidationError') {
-        error = Error('Неправильно введены данные');
+        error = Error(badData);
         error.statusCode = 400;
         next(error);
       }
@@ -49,7 +51,7 @@ const deleteArticle = (req, res, next) => {
   Article.findById(id).select('+owner')
     .then((data) => {
       if (!data) {
-        throw new BadRequestError('Такой статьи нет');
+        throw new ForbiddenError(notYourArticle);
       }
       Article.findByIdAndRemove(id)
         .then((deletedArticle) => {
@@ -59,7 +61,7 @@ const deleteArticle = (req, res, next) => {
     .catch((err) => {
       let error;
       if (err.name === 'CastError') {
-        error = Error('Неправильный id статьи');
+        error = Error(badId);
         error.statusCode = 400;
         next(error);
       }

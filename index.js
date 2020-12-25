@@ -6,20 +6,20 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 const cors = require('cors');
 const helmet = require('helmet');
-const limiter = require('./middlewares/limiter');
 const { errors } = require('celebrate');
+const limiter = require('./middlewares/limiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const indexRouter = require('./routes/index');
 const sendError = require('./middlewares/sendError');
+const { mongoPath } = require('./constants/forEnv');
 
-const { PORT = 3000, MONGO_PATH } = process.env;
+const { PORT = 3000 } = process.env;
 
 app.use(bodyParser.json());
 app.use(cors());
 app.use(helmet());
-app.use(limiter);
 
-mongoose.connect(MONGO_PATH, {
+mongoose.connect(mongoPath, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -30,6 +30,7 @@ app.use(indexRouter);
 app.use(errorLogger);
 app.use(errors());
 app.use(sendError);
+app.use(limiter);
 
 app.listen(PORT, () => {
 });
